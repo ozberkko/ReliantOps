@@ -1,0 +1,16 @@
+{
+  "event_id": "a1b2c3d4-e5f6-4789-8123-456789abcdef",
+  "event_type": "anomaly",
+  "service": "checkout",
+  "version": "1.0.0",
+  "environment": "production",
+  "timestamp_utc": "2026-11-03T10:30:00Z",
+  "trace_id": "trace-001",
+  "span_id": "span-001",
+  "source": "otel",
+  "payload_ref": "metrics/checkout/cpu",
+  "metric_name": "cpu_usage",
+  "observed_value": 95.5,
+  "severity": "high",
+  "detector": "isolation_forest"
+}

@@ -1,0 +1,16 @@
+{
+  "event_id": "b1b2c3d4-e5f6-4789-8123-456789abcdef",
+  "event_type": "deployment",
+  "service": "checkout",
+  "version": "1.1.0",
+  "environment": "production",
+  "timestamp_utc": "2026-11-03T10:35:00Z",
+  "trace_id": null,
+  "span_id": null,
+  "source": "deployment_platform",
+  "payload_ref": "deployments/deploy-001",
+  "previous_version": "1.0.0",
+  "deployed_version": "1.1.0",
+  "deployment_id": "deploy-001",
+  "is_causal": null
+}

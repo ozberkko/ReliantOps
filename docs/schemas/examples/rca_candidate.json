@@ -1,0 +1,19 @@
+{
+  "event_id": "c1b2c3d4-e5f6-4789-8123-456789abcdef",
+  "event_type": "rca_candidate",
+  "service": "checkout",
+  "version": "1.1.0",
+  "environment": "production",
+  "timestamp_utc": "2026-11-03T10:40:00Z",
+  "trace_id": "trace-001",
+  "span_id": null,
+  "source": "rca_engine",
+  "payload_ref": "rca/candidates/run-001",
+  "candidate_service": "checkout",
+  "ranking_score": 0.92,
+  "rank": 1,
+  "evidence": [
+    "cpu_usage anomaly",
+    "recent deployment"
+  ]
+}
