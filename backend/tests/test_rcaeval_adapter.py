@@ -187,7 +187,6 @@ def test_missing_metric_time_column_raises_error(rcaeval_case):
         list(adapter.iter_metric_events())
 
 
-
 def test_missing_logs_file_returns_no_events(rcaeval_case):
     (rcaeval_case / "logs.parquet").unlink()
 
