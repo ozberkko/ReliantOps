@@ -185,3 +185,98 @@ def test_missing_metric_time_column_raises_error(rcaeval_case):
 
     with pytest.raises(ValueError, match="missing required columns"):
         list(adapter.iter_metric_events())
+
+
+
+def test_missing_logs_file_returns_no_events(rcaeval_case):
+    (rcaeval_case / "logs.parquet").unlink()
+
+    adapter = RCAEvalAdapter(rcaeval_case)
+
+    assert list(adapter.iter_log_events()) == []
+
+
+def test_non_finite_metric_values_are_skipped(rcaeval_case):
+    metrics = pa.table(
+        {
+            "time": [1705353846],
+            "checkoutservice_cpu_usage": [float("nan")],
+            "frontend_cpu_usage": [float("inf")],
+            "cartservice_cpu_usage": [float("-inf")],
+            "paymentservice_cpu_usage": [0.5],
+        }
+    )
+    pq.write_table(metrics, rcaeval_case / "metrics.parquet")
+
+    adapter = RCAEvalAdapter(rcaeval_case)
+    events = list(adapter.iter_metric_events())
+
+    assert len(events) == 1
+    assert events[0].service == "paymentservice"
+    assert events[0].value == 0.5
+
+
+def test_malformed_metric_column_name_raises_error(rcaeval_case):
+    metrics = pa.table(
+        {
+            "time": [1705353846],
+            "invalidmetricname": [0.5],
+        }
+    )
+    pq.write_table(metrics, rcaeval_case / "metrics.parquet")
+
+    adapter = RCAEvalAdapter(rcaeval_case)
+
+    with pytest.raises(ValueError, match="Unexpected metric column name"):
+        list(adapter.iter_metric_events())
+
+
+def test_null_log_timestamp_raises_error(rcaeval_case):
+    logs = pa.table(
+        {
+            "timestamp": [None],
+            "container_name": ["checkoutservice"],
+            "message": ["message"],
+        }
+    )
+    pq.write_table(logs, rcaeval_case / "logs.parquet")
+
+    adapter = RCAEvalAdapter(rcaeval_case)
+
+    with pytest.raises(ValueError, match="Null log timestamp"):
+        list(adapter.iter_log_events())
+
+
+def test_null_trace_span_id_raises_error(rcaeval_case):
+    traces = pa.table(
+        {
+            "startTimeMillis": [1705354566000],
+            "traceID": ["trace-001"],
+            "spanID": [None],
+            "serviceName": ["checkoutservice"],
+            "operationName": ["Checkout"],
+        }
+    )
+    pq.write_table(traces, rcaeval_case / "traces.parquet")
+
+    adapter = RCAEvalAdapter(rcaeval_case)
+
+    with pytest.raises(ValueError, match="Null spanID"):
+        list(adapter.iter_trace_spans())
+
+
+def test_missing_trace_column_raises_error(rcaeval_case):
+    traces = pa.table(
+        {
+            "startTimeMillis": [1705354566000],
+            "traceID": ["trace-001"],
+            "spanID": ["span-001"],
+            "serviceName": ["checkoutservice"],
+        }
+    )
+    pq.write_table(traces, rcaeval_case / "traces.parquet")
+
+    adapter = RCAEvalAdapter(rcaeval_case)
+
+    with pytest.raises(ValueError, match="missing required columns"):
+        list(adapter.iter_trace_spans())
