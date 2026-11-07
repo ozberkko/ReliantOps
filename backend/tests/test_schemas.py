@@ -16,12 +16,7 @@ from reliantops.schemas import (
     RunRecord,
 )
 
-EXAMPLES_DIR = (
-    Path(__file__).resolve().parents[2]
-    / "docs"
-    / "schemas"
-    / "examples"
-)
+EXAMPLES_DIR = Path(__file__).resolve().parents[2] / "docs" / "schemas" / "examples"
 
 
 @pytest.mark.parametrize(
@@ -152,3 +147,13 @@ def test_run_record_accepts_valid_data() -> None:
 
     assert event.event_type == EventType.RUN_RECORD
     assert event.status == "completed"
+
+
+def test_version_is_optional_but_not_empty() -> None:
+    data = base_event_data()
+    data["version"] = None
+    assert CanonicalEvent(**data).version is None
+
+    data["version"] = ""
+    with pytest.raises(ValidationError):
+        CanonicalEvent(**data)

@@ -1,4 +1,3 @@
-
 """Canonical event schemas for ReliantOps."""
 
 from datetime import datetime, timezone
@@ -14,6 +13,9 @@ class EventType(StrEnum):
     DEPLOYMENT = "deployment"
     RCA_CANDIDATE = "rca_candidate"
     RUN_RECORD = "run_record"
+    METRIC = "metric"
+    LOG = "log"
+    TRACE_SPAN = "trace"
 
 
 class CanonicalEvent(BaseModel):
@@ -24,7 +26,7 @@ class CanonicalEvent(BaseModel):
     event_id: UUID
     event_type: EventType
     service: str = Field(min_length=1)
-    version: str = Field(min_length=1)
+    version: str | None = Field(default=None, min_length=1)
     environment: str = Field(min_length=1)
     timestamp_utc: datetime
     trace_id: str | None = None
@@ -77,3 +79,38 @@ class RunRecord(CanonicalEvent):
     random_seed: int
     status: str = Field(min_length=1)
     ground_truth: dict[str, Any] = Field(default_factory=dict)
+
+
+class ObservationEvent(CanonicalEvent):
+    """Raw telemetry observation tied to a benchmark case.
+
+    Observations carry no severity or detector identity; those belong to
+    AnomalyEvent and are produced by detectors, never by adapters.
+    """
+
+    case_id: str = Field(min_length=1)
+
+
+class MetricObservation(ObservationEvent):
+    event_type: EventType = EventType.METRIC
+
+    metric_name: str = Field(min_length=1)
+    value: float
+
+
+class LogEvent(ObservationEvent):
+    event_type: EventType = EventType.LOG
+
+    message: str
+
+
+class TraceSpan(ObservationEvent):
+    event_type: EventType = EventType.TRACE_SPAN
+
+    operation_name: str
+    method_name: str | None = None
+    parent_span_id: str | None = None
+    # Units/semantics are unverified (Day 32 open questions): kept raw.
+    start_time_raw: int | None = None
+    duration_raw: int | None = None
+    status_code_raw: int | None = None
