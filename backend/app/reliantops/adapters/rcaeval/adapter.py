@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import math
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterator
 from uuid import NAMESPACE_URL, uuid5
