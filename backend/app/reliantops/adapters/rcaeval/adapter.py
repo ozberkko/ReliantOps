@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import math
 from pathlib import Path
 from typing import Iterator
 from uuid import NAMESPACE_URL, uuid5
@@ -128,6 +129,10 @@ class RCAEvalAdapter:
                     if value is None:
                         continue
 
+                    numeric_value = float(value)
+                    if not math.isfinite(numeric_value):
+                        continue
+
                     if "_" not in column:
                         raise ValueError(f"Unexpected metric column name: {column!r}")
 
@@ -148,7 +153,7 @@ class RCAEvalAdapter:
                         **fields,
                         timestamp_utc=timestamp,
                         metric_name=metric_name,
-                        value=float(value),
+                        value=numeric_value,
                     )
 
                 row_index += 1
@@ -266,7 +271,7 @@ class RCAEvalAdapter:
                 row_index += 1
 
     def iter_case_events(self) -> Iterator[CanonicalEvent]:
-        """Yield metrics, logs, and traces in source order."""
+        """Yield metrics, then logs, then traces (not globally time-sorted)."""
         yield from self.iter_metric_events()
         yield from self.iter_log_events()
         yield from self.iter_trace_spans()
