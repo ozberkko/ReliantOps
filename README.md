@@ -13,7 +13,7 @@ ReliantOps/
 ├── docs/research/       # Research protocol and project documentation
 ├── backend/app/         # Backend application
 ├── backend/tests/       # Backend tests
-├── adapters/rcaeval/    # RCAEval dataset adapter (planned)
+├── backend/app/reliantops/adapters/rcaeval/  # RCAEval dataset adapter
 ├── configs/             # Configuration files
 └── scripts/             # Development and data utilities
 ```
