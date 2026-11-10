@@ -8,6 +8,27 @@ from collections.abc import Sequence
 PRE_SECONDS = 720
 POST_SECONDS = 720
 
+STEP_SECONDS = 1
+
+
+def validate_regular_axis(times: Sequence[int], step: int = STEP_SECONDS) -> None:
+    """Raise ValueError unless times are strictly ascending with a fixed step.
+
+    One check covers all failure modes: unsorted values, duplicate timestamps
+    and missing seconds all show up as a gap that differs from `step`.
+    """
+    for previous, current in zip(times, times[1:]):
+        gap = current - previous
+        if gap == step:
+            continue
+        if gap == 0:
+            raise ValueError(f"duplicate timestamp {current}")
+        if gap < 0:
+            raise ValueError(f"timestamps not ascending at {current}")
+        raise ValueError(
+            f"irregular time axis: gap of {gap}s after {previous} (expected {step}s)"
+        )
+
 
 def window_slices(
     times: Sequence[int],
@@ -20,8 +41,7 @@ def window_slices(
     pre  = [inject_time - pre_seconds, inject_time)
     post = [inject_time, inject_time + post_seconds]  (both ends included)
     """
-    if any(b < a for a, b in zip(times, times[1:])):
-        raise ValueError("times must be sorted ascending")
+    validate_regular_axis(times)
 
     start = bisect_left(times, inject_time - pre_seconds)
     middle = bisect_left(times, inject_time)
