@@ -1,0 +1,40 @@
+"""Tests for pre/post injection window slicing."""
+
+import pytest
+from reliantops.windows import has_full_windows, window_slices
+
+INJECT = 10_000
+
+
+def make_times(before: int = 720, after: int = 720) -> list[int]:
+    return list(range(INJECT - before, INJECT + after + 1))
+
+
+def test_window_slices_follow_protocol_boundaries() -> None:
+    times = make_times()
+    pre, post = window_slices(times, INJECT)
+
+    assert len(times[pre]) == 720
+    assert len(times[post]) == 721
+    assert times[pre][-1] == INJECT - 1
+    assert times[post][0] == INJECT
+    assert times[post][-1] == INJECT + 720
+
+
+def test_rows_outside_the_windows_are_excluded() -> None:
+    times = make_times(before=900, after=900)
+    pre, post = window_slices(times, INJECT)
+
+    assert times[pre][0] == INJECT - 720
+    assert times[post][-1] == INJECT + 720
+
+
+def test_full_windows_are_detected() -> None:
+    assert has_full_windows(make_times(), INJECT)
+    assert not has_full_windows(make_times(before=600), INJECT)
+    assert not has_full_windows(make_times(after=719), INJECT)
+
+
+def test_unsorted_times_are_rejected() -> None:
+    with pytest.raises(ValueError):
+        window_slices([3, 2, 1], 2)
