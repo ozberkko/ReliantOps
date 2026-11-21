@@ -16,6 +16,9 @@ def main(root: str) -> None:
         p for p in Path(root).iterdir()
         if p.is_dir() and p.name.startswith("re2tt_")
     )
+    if not cases:
+        raise SystemExit(f"no re2tt_* case folders found in {root}")
+    
     reference = None
     mismatched = 0
     nan_cells = 0

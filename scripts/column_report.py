@@ -15,6 +15,8 @@ def main(root: str) -> None:
         p for p in Path(root).iterdir()
         if p.is_dir() and p.name.startswith("re2tt_")
     )
+    if not cases:
+        raise SystemExit(f"no re2tt_* case folders found in {root}")
     per_case: dict[str, set[str]] = {}
     for case in cases:
         names = pq.ParquetFile(case / "metrics.parquet").schema_arrow.names
