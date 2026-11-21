@@ -17,6 +17,7 @@ dependencies = [
 [project.optional-dependencies]
 data = [
     "pyarrow==26.0.1",
+    "numpy==2.5.5" ,
 ]
 dev = [
     "pytest==8.4.2",
