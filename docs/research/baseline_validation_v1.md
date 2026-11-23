@@ -31,7 +31,7 @@ reference matrix: (25920, 337)
     loss    recall=0.67 missed=1 mttd median=121.0
     mem     recall=1.00 missed=0 mttd median=7
     socket  recall=1.00 missed=0 mttd median=53
-  ```
+```
 
 ## Notes
 
