@@ -2,7 +2,13 @@
 
 import numpy as np
 import pytest
-from reliantops.evaluation import evaluate_case
+from reliantops.evaluation import (
+    CaseOutcome,
+    evaluate_case,
+    fault_family,
+    summarize,
+    summarize_by_family,
+)
 
 PRE = slice(0, 720)
 POST = slice(720, 1441)
@@ -46,3 +52,39 @@ def test_score_equal_to_tau_is_an_alert() -> None:
 def test_wrong_pre_length_raises() -> None:
     with pytest.raises(ValueError):
         evaluate_case(zeros(), slice(0, 700), POST, tau=3.0)
+
+def outcome(mttd: int | None, false_alarms: int = 0) -> CaseOutcome:
+    return CaseOutcome(mttd is not None, mttd, false_alarms, 12)
+
+
+def test_summary_ignores_missed_cases_in_mttd() -> None:
+    s = summarize([outcome(10), outcome(30), outcome(None)])
+    assert s.recall == pytest.approx(2 / 3)
+    assert s.missed == 1
+    assert s.mttd_mean == 20
+    assert s.mttd_median == 20
+
+
+def test_fpr_pools_windows_across_cases() -> None:
+    s = summarize([outcome(1, 3), outcome(1, 0)])
+    assert s.fpr == pytest.approx(3 / 24)
+
+
+def test_all_missed_has_no_mttd() -> None:
+    s = summarize([outcome(None)])
+    assert s.recall == 0
+    assert s.mttd_mean is None
+
+
+def test_fault_family_and_grouping() -> None:
+    assert fault_family("re2tt_ts-auth-service_cpu_2") == "cpu"
+    with pytest.raises(ValueError):
+        fault_family("bad_name")
+    result = summarize_by_family(
+        {
+            "re2tt_ts-a-service_cpu_1": outcome(5),
+            "re2tt_ts-a-service_mem_1": outcome(None),
+        }
+    )
+    assert list(result) == ["cpu", "mem"]
+    assert result["mem"].recall == 0

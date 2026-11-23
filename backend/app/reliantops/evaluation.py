@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from statistics import mean, median
 
 import numpy as np
 
@@ -33,3 +36,46 @@ def evaluate_case(
     false_alarms = int((windows >= tau).any(axis=1).sum())
 
     return CaseOutcome(detected, mttd, false_alarms, len(windows))
+
+
+@dataclass(frozen=True)
+class Summary:
+    n_cases: int
+    recall: float
+    missed: int
+    mttd_mean: float | None
+    mttd_median: float | None
+    fpr: float
+
+
+def summarize(outcomes: Sequence[CaseOutcome]) -> Summary:
+    if not outcomes:
+        raise ValueError("no outcomes to summarize")
+    mttds = [o.mttd for o in outcomes if o.mttd is not None]
+    windows = sum(o.n_windows for o in outcomes)
+    false_alarms = sum(o.false_alarm_windows for o in outcomes)
+    return Summary(
+        n_cases=len(outcomes),
+        recall=len(mttds) / len(outcomes),
+        missed=len(outcomes) - len(mttds),
+        mttd_mean=mean(mttds) if mttds else None,
+        mttd_median=median(mttds) if mttds else None,
+        fpr=false_alarms / windows,
+    )
+
+
+def fault_family(case_name: str) -> str:
+    # re2tt_<service>_<fault>_<index>; service names contain '-', not '_'
+    parts = case_name.split("_")
+    if len(parts) != 4 or parts[0] != "re2tt":
+        raise ValueError(f"unexpected case name: {case_name}")
+    return parts[2]
+
+
+def summarize_by_family(
+    outcomes: Mapping[str, CaseOutcome],
+) -> dict[str, Summary]:
+    groups: dict[str, list[CaseOutcome]] = defaultdict(list)
+    for name, outcome in outcomes.items():
+        groups[fault_family(name)].append(outcome)
+    return {family: summarize(group) for family, group in sorted(groups.items())}
