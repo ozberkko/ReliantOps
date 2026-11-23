@@ -10,3 +10,4 @@
 - Feature set v1: metric columns present in all 90 local RE2-TT cases (337), fixed by column names only (configs/re2tt_features_v1.json). Absent columns are not imputed.
 - Missing values: the loader keeps NaN as NaN; detectors skip NaN cells. Columns that are constant or have < 2 finite values in the reference are not used.
 - Step score of the z-score detector = max absolute z-score over usable columns.
+- EWMA detector: lambda = 0.2 (fixed, never tuned); state s_t = lambda*x_t + (1-lambda)*s_(t-1) with s_0 = reference mean, state unchanged at NaN cells; step score = max over usable columns of |s_t - mean| / (std*sqrt(lambda/(2-lambda))). The state is stateful, so the evaluator scores a case's full series before slicing pre/post windows.

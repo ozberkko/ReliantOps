@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+from reliantops.detectors.ewma import EWMADetector
 from reliantops.detectors.zscore import ZScoreDetector
 
 
@@ -32,3 +33,28 @@ def test_constant_column_is_not_used() -> None:
     assert detector.usable_.tolist() == [True, False]
     with pytest.raises(ValueError):
         ZScoreDetector().fit(np.ones((10, 2)))
+
+def test_ewma_accumulates_small_persistent_shift() -> None:
+    ewma, z = EWMADetector(), ZScoreDetector()
+    ewma.fit(reference())
+    z.fit(reference())
+    shifted = np.full((60, 3), 1.0)
+    assert ewma.score(shifted)[-1] > 2.5 > z.score(shifted)[-1]
+
+
+def test_ewma_damps_a_single_spike() -> None:
+    ewma, z = EWMADetector(), ZScoreDetector()
+    ewma.fit(reference())
+    z.fit(reference())
+    X = np.zeros((20, 3))
+    X[10, 1] = 10.0
+    assert ewma.score(X).max() < z.score(X).max()
+
+
+def test_ewma_skips_nan_and_validates_lambda() -> None:
+    ewma = EWMADetector()
+    ewma.fit(reference())
+    scores = ewma.score(np.full((5, 3), np.nan))
+    assert np.allclose(scores, scores[0])
+    with pytest.raises(ValueError):
+        EWMADetector(lam=0.0)
