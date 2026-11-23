@@ -1,0 +1,11 @@
+{
+  "rule": "smallest tau with window-level FPR <= max_fpr on pooled validation pre-windows (all families), chosen per detector",
+  "max_fpr": 0.05,
+  "n_validation_windows": 216,
+  "features": "configs/re2tt_features_v1.json",
+  "split": "configs/re2tt_split_v1.json",
+  "tau": {
+    "zscore": 17.971382303638187,
+    "ewma": 52.75653312592666
+  }
+}

@@ -13,3 +13,4 @@
 - EWMA detector: lambda = 0.2 (fixed, never tuned); state s_t = lambda*x_t + (1-lambda)*s_(t-1) with s_0 = reference mean, state unchanged at NaN cells; step score = max over usable columns of |s_t - mean| / (std*sqrt(lambda/(2-lambda))). The state is stateful, so the evaluator scores a case's full series before slicing pre/post windows.
 - tau is the smallest threshold whose window-level FPR on the pooled validation pre-windows (all families) is <= 5%; ties above the maximum fall back to just above the maximum. Each detector gets its own tau.
 - Validation results (Recall, MTTD) are development results, not final claims; the test split stays closed until Week 14.s
+- Frozen thresholds: the selected taus are stored in configs/baseline_tau_v1.json. The Week 14 test run reads them from that file and never re-selects tau; any change to them requires a new versioned file and a recorded reason.

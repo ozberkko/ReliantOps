@@ -13,6 +13,7 @@ import numpy as np
 from reliantops.detectors.ewma import EWMADetector
 from reliantops.detectors.zscore import ZScoreDetector
 from reliantops.evaluation import (
+    MAX_FPR,
     evaluate_case,
     select_tau,
     summarize,
@@ -39,6 +40,9 @@ def main(root: str) -> None:
     reference = np.vstack([s.values[s.pre] for s in calibration.values()])
     print(f"reference matrix: {reference.shape}")
 
+    taus: dict[str, float] = {}
+    n_windows = 0
+
     for detector in (ZScoreDetector(), EWMADetector()):
         detector.fit(reference)
         scores = {n: detector.score(s.values) for n, s in validation.items()}
@@ -46,6 +50,8 @@ def main(root: str) -> None:
             [window_maxima(scores[n][s.pre]) for n, s in validation.items()]
         )
         tau = select_tau(maxima)
+        taus[detector.name] = tau
+        n_windows = len(maxima)
         outcomes = {
             n: evaluate_case(scores[n], s.pre, s.post, tau)
             for n, s in validation.items()
@@ -61,6 +67,20 @@ def main(root: str) -> None:
                 f"    {family:7s} recall={s.recall:.2f} missed={s.missed} "
                 f"mttd median={s.mttd_median}"
             )
+
+        frozen = {
+        "rule": "smallest tau with window-level FPR <= max_fpr on pooled "
+        "validation pre-windows (all families), chosen per detector",
+        "max_fpr": MAX_FPR,
+        "n_validation_windows": n_windows,
+        "features": "configs/re2tt_features_v1.json",
+        "split": "configs/re2tt_split_v1.json",
+        "tau": taus,
+    }
+    Path("configs/baseline_tau_v1.json").write_text(
+        json.dumps(frozen, indent=2) + "\n", encoding="utf-8"
+    )
+    print("wrote configs/baseline_tau_v1.json")
 
 
 if __name__ == "__main__":
