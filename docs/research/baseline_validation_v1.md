@@ -15,7 +15,7 @@ the test split stays closed until Week 14.
 
 ## Output
 
-
+```
 reference matrix: (25920, 337)
 [zscore] tau=17.971 window-FPR=0.046 recall=0.78 missed=4 mttd mean=35.92857142857143 median=25.5
     cpu     recall=0.00 missed=3 mttd median=None
@@ -31,6 +31,7 @@ reference matrix: (25920, 337)
     loss    recall=0.67 missed=1 mttd median=121.0
     mem     recall=1.00 missed=0 mttd median=7
     socket  recall=1.00 missed=0 mttd median=53
+  ```
 
 ## Notes
 
