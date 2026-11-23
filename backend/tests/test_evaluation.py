@@ -6,8 +6,10 @@ from reliantops.evaluation import (
     CaseOutcome,
     evaluate_case,
     fault_family,
+    select_tau,
     summarize,
     summarize_by_family,
+    window_maxima,
 )
 
 PRE = slice(0, 720)
@@ -88,3 +90,25 @@ def test_fault_family_and_grouping() -> None:
     )
     assert list(result) == ["cpu", "mem"]
     assert result["mem"].recall == 0
+
+def test_window_maxima_takes_max_of_each_60s_window() -> None:
+    scores = np.zeros(720)
+    scores[5] = 2.0
+    scores[130] = 7.0
+    maxima = window_maxima(scores)
+    assert len(maxima) == 12
+    assert maxima[0] == 2.0
+    assert maxima[2] == 7.0
+
+
+def test_select_tau_gives_smallest_threshold_within_limit() -> None:
+    maxima = np.arange(100, dtype=float)
+    tau = select_tau(maxima)
+    assert tau == 95.0
+    assert np.mean(maxima >= tau) <= 0.05
+    assert np.mean(maxima >= tau - 1) > 0.05
+
+
+def test_select_tau_with_ties_goes_above_the_maximum() -> None:
+    tau = select_tau(np.ones(100))
+    assert tau > 1.0

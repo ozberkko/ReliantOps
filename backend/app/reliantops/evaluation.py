@@ -12,6 +12,7 @@ import numpy as np
 from reliantops.windows import PRE_SECONDS
 
 FPR_WINDOW_SECONDS = 60
+MAX_FPR = 0.05  # protocol: maximum window-level FPR
 
 
 @dataclass(frozen=True)
@@ -20,6 +21,18 @@ class CaseOutcome:
     mttd: int | None  # seconds from injection to first alert; None if missed
     false_alarm_windows: int
     n_windows: int
+
+def window_maxima(pre_scores: np.ndarray) -> np.ndarray:
+    """Max step score in each non-overlapping 60 s window of a pre window."""
+    return pre_scores.reshape(-1, FPR_WINDOW_SECONDS).max(axis=1)
+
+
+def select_tau(maxima: np.ndarray, max_fpr: float = MAX_FPR) -> float:
+    """Smallest tau whose window-level FPR on `maxima` is <= max_fpr."""
+    for tau in np.sort(np.unique(maxima)):
+        if np.mean(maxima >= tau) <= max_fpr:
+            return float(tau)
+    return float(np.nextafter(maxima.max(), np.inf))
 
 
 def evaluate_case(
@@ -32,10 +45,10 @@ def evaluate_case(
     pre_scores = scores[pre]
     if len(pre_scores) != PRE_SECONDS:
         raise ValueError(f"expected {PRE_SECONDS} pre rows, got {len(pre_scores)}")
-    windows = pre_scores.reshape(-1, FPR_WINDOW_SECONDS)
-    false_alarms = int((windows >= tau).any(axis=1).sum())
+    maxima = window_maxima(pre_scores)
+    false_alarms = int((maxima >= tau).sum())
 
-    return CaseOutcome(detected, mttd, false_alarms, len(windows))
+    return CaseOutcome(detected, mttd, false_alarms, len(maxima))
 
 
 @dataclass(frozen=True)
