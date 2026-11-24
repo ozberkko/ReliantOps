@@ -4,7 +4,7 @@ Root Cause Analysis Platform for Distributed Software Systems.
 
 **Status:** Early Development
 
-ReliantOps is a research-oriented platform for investigating root causes of incidents in distributed software systems. Its research scope and methodology are documented in the frozen [Research Protocol v1.0](docs/research/ReliantOps_Research_Protocol_v1.0.md).
+ReliantOps is a research-oriented platform for investigating root causes of incidents in distributed software systems. Its research scope and methodology are documented in the frozen [Research Protocol v1.0](docs/research/ReliantOps_Research_Protocol_v1.0.md) and its [v1.1 Supplement](docs/research/ReliantOps_Research_Protocol_v1.1_Supplement.md), which records implementation decisions and the changes to v1.0 text.
 
 ## Repository layout
 
@@ -56,7 +56,7 @@ python -m pytest
 
 ## Research baseline
 
-The Research Protocol v1.0 is preserved as a tagged reference (`protocol-v1`). The `main` branch may evolve independently.
+The Research Protocol v1.0 is preserved as a tagged reference (`protocol-v1`), unchanged. The v1.1 Supplement is tagged `protocol-v1.1`. The `main` branch may evolve independently.
 
 ## RCAEval Adapter v0
 
