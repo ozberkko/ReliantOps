@@ -26,10 +26,16 @@ window-FPR 0.046. cpu (H1 primary family): 0/3 for both.
 - No detector, threshold or split change is made. Any change would be a
   versioned v2 with a recorded reason.
 
+## Data provenance
+- The local RE2-TT data come from the Hugging Face dataset
+  `phamquiluan/RCAEval`, not from the Zenodo archive named in an earlier
+  version of `day36-case-selection.md` (corrected 2026-11-25).
+- The 90 local cases are pinned by `configs/re2tt_data_manifest_v1.json`.
+
 ## Open items
 - docs/research: v1.1 supplementary protocol
-- Data archive checksum
-- H2: RE2-TT trace/log inventory
+- H2: RE2-TT trace/log inventory (`re2tt_ts-auth-service_cpu_1` has no
+  `logs.parquet`; the source index lacks it too)
 
 ## Diagnostic output
 
