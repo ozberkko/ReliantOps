@@ -1,0 +1,38 @@
+{
+  "rule": "highest pooled validation recall at the selected tau; ties go to the default configuration, then fewer trees",
+  "seed": 42,
+  "selected": {
+    "n_estimators": 100,
+    "max_samples": 256
+  },
+  "evaluated": [
+    {
+      "n_estimators": 100,
+      "max_samples": 256,
+      "tau": 0.5444635916830729,
+      "recall": 0.05555555555555555,
+      "fpr": 0.046296296296296294
+    },
+    {
+      "n_estimators": 100,
+      "max_samples": 1024,
+      "tau": 0.5176186123993924,
+      "recall": 0.0,
+      "fpr": 0.046296296296296294
+    },
+    {
+      "n_estimators": 300,
+      "max_samples": 256,
+      "tau": 0.5399238101601962,
+      "recall": 0.0,
+      "fpr": 0.046296296296296294
+    },
+    {
+      "n_estimators": 300,
+      "max_samples": 1024,
+      "tau": 0.5137915253896738,
+      "recall": 0.05555555555555555,
+      "fpr": 0.046296296296296294
+    }
+  ]
+}

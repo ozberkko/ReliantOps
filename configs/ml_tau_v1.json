@@ -1,0 +1,8 @@
+{
+  "rule": "smallest tau with window-level FPR <= max_fpr on pooled validation pre-windows (all families)",
+  "max_fpr": 0.05,
+  "n_validation_windows": 216,
+  "tau": {
+    "iforest": 0.5444635916830729
+  }
+}
