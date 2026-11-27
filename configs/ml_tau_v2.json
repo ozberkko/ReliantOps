@@ -1,0 +1,8 @@
+{
+  "rule": "smallest tau with window-level FPR <= max_fpr on pooled validation pre-windows (all families); post-hoc v2, see docs/research/ml_detector_rule_v2.md",
+  "max_fpr": 0.05,
+  "n_validation_windows": 216,
+  "tau": {
+    "iforest_v2": 4.906944645572097
+  }
+}
