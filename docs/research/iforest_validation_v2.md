@@ -17,6 +17,15 @@ services: 68
     mem     recall=1.00 missed=0 mttd median=23
     socket  recall=1.00 missed=0 mttd median=27
 ```
+## Seed output
+
+```
+seed=1 tau=5.092 fpr=0.046 recall=0.72 missed=5 | cpu=0.33 delay=1.00 disk=1.00 loss=0.00 mem=1.00 socket=1.00
+seed=2 tau=4.964 fpr=0.046 recall=0.89 missed=2 | cpu=1.00 delay=1.00 disk=1.00 loss=0.33 mem=1.00 socket=1.00
+seed=3 tau=5.408 fpr=0.046 recall=0.72 missed=5 | cpu=0.00 delay=1.00 disk=1.00 loss=0.33 mem=1.00 socket=1.00
+seed=4 tau=5.064 fpr=0.046 recall=0.89 missed=2 | cpu=0.67 delay=1.00 disk=1.00 loss=0.67 mem=1.00 socket=1.00
+seed=5 tau=5.235 fpr=0.046 recall=0.83 missed=3 | cpu=0.67 delay=1.00 disk=1.00 loss=0.33 mem=1.00 socket=1.00
+```
 
 ## Notes
 
@@ -30,3 +39,10 @@ services: 68
 - v2 was designed after seeing v1 validation results; the baselines had no
   such revision. Single run, no further variants.
 - The test split stays closed until Week 14.
+- Seed stability (`scripts/seed_check_v2.py`, seeds 1-5 fixed in advance,
+  read-only): recall 13, 16, 13, 16 and 15 of 18 cases; with the frozen
+  seed 42 (15 of 18) the range is 13-16 of 18, mean about 14.7. cpu ranges
+  from 0 to 3 of 3, loss from 0 to 2 of 3; delay, disk, mem and socket are
+  3 of 3 for every seed.
+- The overall recall of v2 is not distinguishable from the baselines
+  (14 of 18). Differences of one case are within seed noise.
